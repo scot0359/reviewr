@@ -1,46 +1,91 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-var app = {
-    // Application Constructor
-    initialize: function() {
-        document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
-    },
+let pages = [];
+let data = [];
 
-    // deviceready Event Handler
-    //
-    // Bind any cordova events here. Common events are:
-    // 'pause', 'resume', etc.
-    onDeviceReady: function() {
-        this.receivedEvent('deviceready');
-    },
+document.addEventListener("DOMContentLoaded", init);
+document.addEventListener('deviceready', init);
 
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
+function init() {
 
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
+    document.getElementById("btnFab").addEventListener('click', takePhoto);
 
-        console.log('Received Event: ' + id);
+    pages = document.querySelectorAll(".page");
+    console.log(pages);
+
+    document.getElementById("btnSend").addEventListener("click", function () {
+        console.log("moving from page 1 to page 2");
+        pages[0].classList.remove("active");
+        pages[1].classList.add("active");
+    });
+
+    //    document.getElementById("btnFab").addEventListener("click", function () {
+    //        pages[0].classList.toggle("active");
+    //        pages[2].classList.toggle("active");
+    //    });
+
+    document.getElementById("btnBack1").addEventListener("click", function () {
+        pages[0].classList.add("active");
+        pages[1].classList.remove("active");
+    });
+
+    document.getElementById("btnBack2").addEventListener("click", function () {
+        pages[0].classList.add("active");
+        pages[2].classList.remove("active");
+    });
+
+    document.getElementById("btnBack3").addEventListener("click", function () {
+        pages[0].classList.add("active");
+        pages[2].classList.remove("active");
+    });
+
+    document.getElementById("btnBack4").addEventListener("click", function () {
+        pages[0].classList.add("active");
+        pages[2].classList.remove("active");
+        
+        document.getElementById("btnSend").innerHTML = localStorage.getItem(JSON.parse("KEY"))
+    });
+
+
+}
+
+
+//******************CAMERA*********************//
+function takePhoto() {
+    let opts = {
+        quality: 80,
+        destinationType: Camera.DestinationType.FILE_URI,
+        sourceType: Camera.PictureSourceType.CAMERA,
+        mediaType: Camera.MediaType.PICTURE,
+        encodingType: Camera.EncodingType.JPEG,
+        cameraDirection: Camera.Direction.BACK,
+        targetWidth: 300,
+        targetHeight: 300
+    };
+    navigator.camera.getPicture(photoSuccess, photoError, opts);
+}
+
+function photoSuccess(imgURI) {
+    document.getElementById("msg").textContent = imgURI;
+    document.getElementById("image").src = imgURI;
+    pages[0].classList.toggle("active");
+    pages[2].classList.toggle("active");
+
+    
+    
+    //***********Local Storage****************//
+    
+    let title = document.querySelector("#title").value;
+
+    let obj = {
+        id: Date.now(),
+        title: title
     }
-};
 
-app.initialize();
+    data.push(obj)
+
+    localStorage.setItem("KEY", JSON.stringify(data));
+
+}
+
+function photoError(msg) {
+    document.getElementById("msg").textContent = msg;
+}
